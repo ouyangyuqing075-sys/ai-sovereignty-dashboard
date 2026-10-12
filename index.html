@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A browser-only classroom dashboard for exploring AI sovereignty survey responses." />
+    <title>Who holds the intelligence?</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script type="module" src="./src/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to dashboard</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <p class="eyebrow">Classroom lens</p>
+        <p>Information Systems</p>
+        <p>Browser-only analysis</p>
+      </div>
+    </header>
+
+    <main id="main-content" class="page-shell">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="section-kicker">A guided evidence view</p>
+          <h1 id="page-title" tabindex="-1">Who holds the intelligence?</h1>
+          <p class="hero-copy">Explore how a spreadsheet of individual answers becomes counts, themes, charts and evidence you can check yourself. The dashboard never rewrites the original answers.</p>
+        </div>
+        <div id="dataset-badge" class="dataset-badge" aria-live="polite">Loading demonstration workbook…</div>
+      </section>
+
+      <nav class="section-nav" aria-label="Dashboard sections">
+        <a href="#overview">Overview</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#investment">AI investment</a>
+        <a href="#reliance">Everyday reliance</a>
+        <a href="#business">Business</a>
+        <a href="#definitions">Definitions</a>
+        <a href="#responses">Responses</a>
+      </nav>
+
+      <section class="workbook-panel card" aria-labelledby="workbook-heading">
+        <div class="section-heading compact">
+          <div>
+            <p class="section-kicker">Workbook</p>
+            <h2 id="workbook-heading">Bring your own evidence</h2>
+          </div>
+          <p id="file-summary" class="muted" aria-live="polite">Preparing the supplied demonstration workbook…</p>
+        </div>
+        <div class="workbook-controls">
+          <label class="upload-control" for="workbook-input">
+            <span>Upload workbook</span>
+            <input id="workbook-input" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+          </label>
+          <button id="load-demo" class="button secondary" type="button">Load demo</button>
+          <label class="select-control" for="worksheet-select">
+            <span>Worksheet</span>
+            <select id="worksheet-select" disabled></select>
+          </label>
+          <div id="drop-target" class="drop-target" tabindex="0" role="button" aria-label="Drop an Excel workbook here or press Enter to select a file">Drop an .xlsx file here</div>
+        </div>
+        <p id="workbook-message" class="help-text" aria-live="polite">Files are read only in this browser. Nothing is sent to an account, database or upload server.</p>
+      </section>
+
+      <section class="explanation card" aria-labelledby="data-heading">
+        <p class="section-kicker">Method</p>
+        <h2 id="data-heading">What data am I looking at?</h2>
+        <div id="data-explanation"></div>
+      </section>
+
+      <section class="filters card" aria-labelledby="filter-heading">
+        <div class="section-heading compact">
+          <div>
+            <p class="section-kicker">Explore</p>
+            <h2 id="filter-heading">Filter the same respondent rows everywhere</h2>
+          </div>
+          <button id="reset-filters" class="button ghost" type="button">Reset filters</button>
+        </div>
+        <div class="filter-grid">
+          <label class="select-control" for="privacy-filter"><span>Privacy concern</span><select id="privacy-filter"></select></label>
+          <label class="select-control" for="preference-filter"><span>AI preference</span><select id="preference-filter"></select></label>
+          <label class="search-control" for="search-input"><span>Search answers or response ID</span><input id="search-input" type="search" placeholder="Try data, coding, local…" /></label>
+        </div>
+        <p id="active-filters" class="active-filters" aria-live="polite"></p>
+      </section>
+
+      <section id="overview" class="dashboard-section" aria-labelledby="overview-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Overview</p>
+            <h2 id="overview-heading">A selected view of the worksheet</h2>
+          </div>
+        </div>
+        <div id="overview-totals" class="metric-grid"></div>
+        <div id="observations" class="observations"></div>
+      </section>
+
+      <section class="chart-grid" aria-label="Four dashboard charts">
+        <article id="privacy" class="chart-card card" aria-labelledby="privacy-heading">
+          <div class="chart-card-heading"><p class="section-kicker">Question 3</p><h2 id="privacy-heading">Privacy concerns</h2></div>
+          <div id="privacy-chart"></div>
+        </article>
+        <article id="investment" class="chart-card card" aria-labelledby="investment-heading">
+          <div class="chart-card-heading"><p class="section-kicker">Question 4</p><h2 id="investment-heading">Local versus foreign AI</h2></div>
+          <div id="preference-chart"></div>
+        </article>
+        <article id="reliance" class="chart-card card" aria-labelledby="reliance-heading">
+          <div class="chart-card-heading"><p class="section-kicker">Question 2</p><h2 id="reliance-heading">Everyday reliance on AI</h2></div>
+          <div id="reliance-chart"></div>
+        </article>
+        <article id="business" class="chart-card card" aria-labelledby="business-heading">
+          <div class="chart-card-heading"><p class="section-kicker">Question 5</p><h2 id="business-heading">Business considerations</h2></div>
+          <div id="business-chart"></div>
+        </article>
+      </section>
+
+      <section class="method-section card" aria-labelledby="method-heading">
+        <p class="section-kicker">Classification</p>
+        <h2 id="method-heading">How answers become themes</h2>
+        <div id="theme-method"></div>
+        <details class="rules-editor">
+          <summary>Inspect &amp; adjust classification rules</summary>
+          <p>Theme grouping applies to the written answers in Questions 2 and 5. Add or remove words or phrases, separate entries with commas, then select Apply theme rules. The changes recalculate charts, examples and any active theme filter; they never change the original answers or workbook, and they do not survive a page reload.</p>
+          <form id="rules-form" class="rules-form"></form>
+          <div class="rule-actions"><button class="button" type="submit" form="rules-form">Apply theme rules</button><button id="restore-rules" class="button ghost" type="button">Restore defaults</button></div>
+        </details>
+        <details class="fixed-rules">
+          <summary>Fixed privacy and AI preference grouping rules</summary>
+          <div id="fixed-rules-content"></div>
+        </details>
+      </section>
+
+      <section id="definitions" class="definitions-section" aria-labelledby="definitions-heading">
+        <div class="section-heading"><div><p class="section-kicker">Question 1</p><h2 id="definitions-heading">What does AI sovereignty mean?</h2></div></div>
+        <div id="definitions-source" class="source-strip"></div>
+        <p class="definitions-note">These quotation cards are original answers to Question 1, not official definitions written or endorsed by this website. The demonstration workbook contains fictional examples. One card is shown for each distinct answer in worksheet order, with its first response ID and Excel row. Cards do not show how common an interpretation is; repeated answers remain in the response table. Blank answers have no quotation, and the cards change when filters change.</p>
+        <div id="definition-cards" class="definition-grid"></div>
+      </section>
+
+      <section id="responses" class="responses-section card" aria-labelledby="responses-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Evidence</p>
+            <h2 id="responses-heading" tabindex="-1">Explore the responses</h2>
+          </div>
+          <p id="table-status" class="muted" aria-live="polite"></p>
+        </div>
+        <div id="column-guide" class="column-guide"></div>
+        <p class="table-help">Each row keeps one respondent’s five original answers together. Search ignores capital letters and filters the entire dashboard, not only this table. An ellipsis means the preview is shortened; use Read full answer for the complete response. “Missing answer” means that question cell was blank. Names, emails, timestamps, points and feedback are excluded.</p>
+        <div class="table-scroll"><table><thead id="response-head"></thead><tbody id="response-body"></tbody></table></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">Built for checking evidence, not scoring opinions.</footer>
+    <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to the top heading">↑ <span>Back to top</span></button>
+  </body>
+</html>
